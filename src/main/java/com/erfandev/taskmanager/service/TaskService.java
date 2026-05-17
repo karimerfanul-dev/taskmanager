@@ -1,6 +1,7 @@
 package com.erfandev.taskmanager.service;
 
 import com.erfandev.taskmanager.entity.Task;
+import com.erfandev.taskmanager.exception.TaskNotFoundException;
 import com.erfandev.taskmanager.repository.TaskRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
@@ -22,31 +23,28 @@ public class TaskService {
         return taskRepository.findAll();
     }
 
-    public Optional<Task> getTaskById(Long id) {
-        return taskRepository.findById(id);
+    public Task getTaskById(Long id) {
+        return taskRepository.findById(id)
+                .orElseThrow( ()-> new TaskNotFoundException(id));
     }
 
     public Task createTask(Task task) {
         return taskRepository.save(task);
     }
 
-    public Optional<Task> updateTask(Long id, Task updatedTask) {
-        return taskRepository.findById(id)
-                .map(task -> {
-                    task.setTitle(updatedTask.getTitle());
-                    task.setDescription(updatedTask.getDescription());
-                    task.setCompleted(updatedTask.getCompleted());
-                    task.setCreatedAt(updatedTask.getCreatedAt());
-                    return taskRepository.save(task);
-                });
+    public Task updateTask(Long id, Task updatedTask) {
+       Task task=taskRepository.findById(id)
+                .orElseThrow(()->new TaskNotFoundException(id));
+        task.setTitle(updatedTask.getTitle());
+        task.setDescription(updatedTask.getDescription());
+        task.setCompleted(updatedTask.getCompleted());
+        task.setCreatedAt(updatedTask.getCreatedAt());
+        return taskRepository.save(task);
     }
-    public boolean deleteTaskById(Long id) {
-        return taskRepository.findById(id)
-                .map(task ->  {
-                    taskRepository.delete(task);
-                    return true;
-                })
-                .orElse(false);
+    public void deleteTaskById(Long id) {
+       Task task= taskRepository.findById(id)
+                .orElseThrow(()-> new TaskNotFoundException(id));
+                 taskRepository.delete(task);
     }
 
     public List<Task> getCompletedTasks(boolean status) {
