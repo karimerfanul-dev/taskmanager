@@ -1,6 +1,8 @@
 package com.erfandev.taskmanager.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,6 +19,8 @@ public class Task {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message= "Title is mandatory")
+    @Size(min=3 ,max=100,message=" title must be between 3 to 100 character")
     @Column(nullable = false)
     private String title;
 
