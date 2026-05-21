@@ -1,7 +1,10 @@
 package com.erfandev.taskmanager.service;
 
+import com.erfandev.taskmanager.dto.TaskRequest;
+import com.erfandev.taskmanager.dto.TaskResponse;
 import com.erfandev.taskmanager.entity.Task;
 import com.erfandev.taskmanager.exception.TaskNotFoundException;
+import com.erfandev.taskmanager.mapper.TaskMapper;
 import com.erfandev.taskmanager.repository.TaskRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +17,11 @@ import java.util.Optional;
 @Transactional
 public class TaskService {
     private final TaskRepository taskRepository;
+    private final TaskMapper taskMapper;
 
-    public TaskService(TaskRepository taskRepository) {
+    public TaskService(TaskRepository taskRepository,
+                       TaskMapper taskMapper) {
+        this.taskMapper = taskMapper;
         this.taskRepository = taskRepository;
     }
 
@@ -23,23 +29,22 @@ public class TaskService {
         return taskRepository.findAll();
     }
 
-    public Task getTaskById(Long id) {
-        return taskRepository.findById(id)
-                .orElseThrow( ()-> new TaskNotFoundException(id));
+    public TaskResponse getTaskById(Long id) {
+        return taskMapper.toResponse(taskRepository.findById(id)
+                .orElseThrow( ()-> new TaskNotFoundException(id)));
     }
 
-    public Task createTask(Task task) {
-        return taskRepository.save(task);
+    public TaskResponse createTask(TaskRequest task) {
+        Task newTask = taskMapper.toEntity(task);
+        Task savedTask=taskRepository.save(newTask);
+        return taskMapper.toResponse(savedTask);
     }
 
-    public Task updateTask(Long id, Task updatedTask) {
+    public TaskResponse updateTask(Long id, TaskRequest updatedTask) {
        Task task=taskRepository.findById(id)
                 .orElseThrow(()->new TaskNotFoundException(id));
-        task.setTitle(updatedTask.getTitle());
-        task.setDescription(updatedTask.getDescription());
-        task.setCompleted(updatedTask.getCompleted());
-        task.setCreatedAt(updatedTask.getCreatedAt());
-        return taskRepository.save(task);
+       taskMapper.updateTask(task,updatedTask);
+         return taskMapper.toResponse(taskRepository.save(task));
     }
     public void deleteTaskById(Long id) {
        Task task= taskRepository.findById(id)

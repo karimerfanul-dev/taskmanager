@@ -1,0 +1,15 @@
+package com.erfandev.taskmanager.dto;
+
+import lombok.Builder;
+
+import java.time.LocalDateTime;
+
+@Builder
+public record TaskResponse(
+        Long id,
+        String title,
+        String description,
+        boolean completed,
+        LocalDateTime created_at
+) {
+}

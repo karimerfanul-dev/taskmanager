@@ -1,5 +1,7 @@
 package com.erfandev.taskmanager.controller;
 
+import com.erfandev.taskmanager.dto.TaskRequest;
+import com.erfandev.taskmanager.dto.TaskResponse;
 import com.erfandev.taskmanager.entity.Task;
 import com.erfandev.taskmanager.repository.TaskRepository;
 import com.erfandev.taskmanager.service.TaskService;
@@ -29,19 +31,19 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
-    public Task getTaskById(@PathVariable Long id){
+    public TaskResponse getTaskById(@PathVariable Long id){
         return taskService.getTaskById(id);
 
     }
 
     @PostMapping
-    public ResponseEntity<Task> createTask(@RequestBody Task task) {
-        Task newTask = taskService.createTask(task);
+    public ResponseEntity<TaskResponse> createTask(@RequestBody TaskRequest task) {
+        TaskResponse newTask = taskService.createTask(task);
         return ResponseEntity.status(HttpStatus.CREATED).body(newTask);
     }
 
     @PutMapping("/{id}")
-    public Task updateTask(@PathVariable Long id, @RequestBody Task updatedTask) {
+    public TaskResponse updateTask(@PathVariable Long id, @RequestBody TaskRequest updatedTask) {
         return taskService.updateTask(id,updatedTask);
     }
 
