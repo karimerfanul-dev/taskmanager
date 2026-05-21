@@ -10,6 +10,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,11 +53,24 @@ public class TaskService {
                  taskRepository.delete(task);
     }
 
-    public List<Task> getCompletedTasks(boolean status) {
-        return taskRepository.findByCompleted(status);
+    public List<TaskResponse> getCompletedTasks(boolean status) {
+        List<Task> task=taskRepository.findByCompleted(status);
+            List<TaskResponse> taskResponses=new ArrayList<>();
+        for(Task t:task) {
+            taskMapper.toResponse(t);
+            taskResponses.add(taskMapper.toResponse(taskRepository.save(t)));
+        }
+        return taskResponses;
     }
 
-    public List<Task> search(String title) {
-        return taskRepository.findByTitleContainingIgnoreCase(title);
+    public List<TaskResponse> search(String title) {
+
+        List<Task> tasks=taskRepository.findByTitleContainingIgnoreCase(title);
+        List<TaskResponse> taskResponses=new ArrayList<>();
+        for(Task t:tasks) {
+            taskMapper.toResponse(t);
+            taskResponses.add(taskMapper.toResponse(taskRepository.save(t)));
+        }
+        return taskResponses;
     }
 }

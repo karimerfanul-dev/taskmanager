@@ -54,12 +54,12 @@ public class TaskController {
     }
 
     @GetMapping("/completed/{status}")
-    public List<Task> findTaskByCompletions(@PathVariable boolean status) {
+    public List<TaskResponse> findTaskByCompletions(@PathVariable boolean status) {
         return taskService.getCompletedTasks(status);
     }
 
     @GetMapping("/search")
-    public List<Task> searchTaskByTitle(@RequestParam String title) {
+    public List<TaskResponse> searchTaskByTitle(@RequestParam String title) {
         return taskService.search(title);
     }
 }
