@@ -7,6 +7,8 @@ import com.erfandev.taskmanager.exception.TaskNotFoundException;
 import com.erfandev.taskmanager.mapper.TaskMapper;
 import com.erfandev.taskmanager.repository.TaskRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,10 @@ public class TaskService {
 
     public List<Task> findAllTasks() {
         return taskRepository.findAll();
+    }
+
+    public Page<Task> findAllTasks(Pageable pageable) {
+        return taskRepository.findAll(pageable);
     }
 
     public TaskResponse getTaskById(Long id) {
@@ -63,7 +69,14 @@ public class TaskService {
         return taskResponses;
     }
 
-    public List<TaskResponse> search(String title) {
+    public List<TaskResponse> getCompletedTasks(boolean status,Pageable pageable) {
+        Page<Task> task=taskRepository.findByCompleted(status,pageable);
+        return task.stream()
+                .map(taskMapper::toResponse)
+                .toList();
+    }
+
+    public List<TaskResponse> searchBYTitle(String title) {
 
         List<Task> tasks=taskRepository.findByTitleContainingIgnoreCase(title);
         List<TaskResponse> taskResponses=new ArrayList<>();
@@ -72,5 +85,17 @@ public class TaskService {
             taskResponses.add(taskMapper.toResponse(taskRepository.save(t)));
         }
         return taskResponses;
+    }
+
+    public Page<Task> searchTaskBYTitle(String title, Pageable pageable) {
+        return  taskRepository.findByTitleContainingIgnoreCase(title, pageable);
+    }
+
+    public Page<Task> searchTasksByTitleAndCompletion(String title, Boolean completed,Pageable pageable) {
+        return taskRepository.findByTitleContainingAndCompleted(title,completed,pageable);
+    }
+
+    public Page<Task> getTaskByCompletion(Boolean completed, Pageable pageable) {
+        return taskRepository.findByCompleted(completed, pageable);
     }
 }
