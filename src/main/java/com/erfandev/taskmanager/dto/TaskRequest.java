@@ -9,7 +9,8 @@ public record TaskRequest(
         String title,
         @Size(max = 500, message = "Description can't be greater than 500 length")
         String description,
-        Boolean completed
+        Boolean completed,
+        Long categoryId
 
 ) {
 }
